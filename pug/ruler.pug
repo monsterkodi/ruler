@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset='utf-8')
+        title ruler
+        link(rel='stylesheet' href='css/ruler.css' type='text/css')
+    body#body(tabindex=0)
+        .right.border
+        .bottom.border
+        #corner
+        #horz.ruler
+            .lines.horizontal
+        .right.handle
+        #width
+        #vert.ruler
+            .lines.vertical
+        .bottom.handle
+        #height
+        #ctrl
+    script(src='ruler.js')

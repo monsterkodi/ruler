@@ -1,0 +1,221 @@
+
+//  0000000  000000000  000   000  000    
+// 000          000      000 000   000    
+// 0000000      000       00000    000    
+//      000     000        000     000    
+// 0000000      000        000     0000000
+
+rulerSize = 22px
+
+font = "Menlo", "Cousine", "Liberation Mono", "Andale Mono", monospace
+
+fill-abs()
+    position            absolute
+    bottom              0
+    right               0
+    left                0
+    top                 0
+
+// 0000000     0000000   0000000    000   000
+// 000   000  000   000  000   000   000 000 
+// 0000000    000   000  000   000    00000  
+// 000   000  000   000  000   000     000   
+// 0000000     0000000   0000000       000   
+
+*
+    outline-width       0
+    box-sizing          border-box
+    
+body
+    fill-abs()
+    margin              0
+    background          rgba(0,0,0,0.1)
+    color               #bbb
+    overflow            hidden
+    font-family         font
+    font-size           10px
+    -webkit-user-select none
+    -webkit-app-region  no-drag
+    cursor              crosshair
+
+//  0000000  000000000  00000000   000      
+// 000          000     000   000  000      
+// 000          000     0000000    000      
+// 000          000     000   000  000      
+//  0000000     000     000   000  0000000  
+
+#ctrl
+    position            absolute
+    cursor              pointer    
+    -webkit-app-region  drag    
+    background          #222
+    overflow            hidden
+    pointer-events      all
+    width               rulerSize
+    height              rulerSize
+
+// 00000000   000   000  000      00000000  00000000   
+// 000   000  000   000  000      000       000   000  
+// 0000000    000   000  000      0000000   0000000    
+// 000   000  000   000  000      000       000   000  
+// 000   000   0000000   0000000  00000000  000   000  
+
+.ruler
+    fill-abs()
+    cursor              pointer    
+    pointer-events      all
+    overflow            hidden
+    background          #222
+    -webkit-app-region  drag
+    
+#horz
+    max-height          rulerSize
+    margin-left         rulerSize
+#vert
+    margin-top          rulerSize
+    max-width           rulerSize
+
+// 000      000  000   000  00000000  
+// 000      000  0000  000  000       
+// 000      000  000 0 000  0000000   
+// 000      000  000  0000  000       
+// 0000000  000  000   000  00000000  
+
+.lines
+    position            relative
+    overflow            visible
+    // border              1px solid red
+
+.lines.horizontal
+    height              100%
+    width               100%
+    
+.lines.vertical
+    width               100%
+    height              100%
+
+.line
+    position            absolute
+    background          #444
+    overflow            visible
+
+.line.horizontal
+    bottom              0
+    width               1px
+    height              (rulerSize / 5)
+    &._10
+        height          (rulerSize / 4)
+    &._50
+        height          (rulerSize / 3)
+    &._100
+        height          (rulerSize / 3)
+
+.line.vertical
+    right 0
+    height              1px
+    width               (rulerSize / 5)
+    &._10
+        width           (rulerSize / 4)
+    &._50
+        width           (rulerSize / 3)
+    &._100
+        width           (rulerSize / 3)
+
+.line._10
+    background          #888
+.line._50
+    background          #888
+    & .num
+        color           #444
+.line._100
+    background          #aaa
+    & .num
+        color           #888
+
+.horizontal .num    
+    text-align          center
+    margin-top          - 13px
+    width               100px
+    margin-left         -50px
+
+.vertical .num    
+    text-align          center
+    margin-left         - 13px
+    height              100px
+    margin-top          -50px
+    writing-mode        vertical-lr
+
+// 000   000   0000000   000   000  0000000    000      00000000  
+// 000   000  000   000  0000  000  000   000  000      000       
+// 000000000  000000000  000 0 000  000   000  000      0000000   
+// 000   000  000   000  000  0000  000   000  000      000       
+// 000   000  000   000  000   000  0000000    0000000  00000000  
+
+.handle
+    position            absolute
+    background          white
+
+.border
+    position            absolute
+    background          rgba(128,128,128,0.25)
+    
+.right
+    right               0
+    width               1px
+    
+.right.handle
+    top                 (rulerSize / 2)
+    height              (rulerSize / 2)
+
+.right.border
+    top                 rulerSize
+    bottom              0
+    
+.bottom
+    bottom              0
+    height              1px
+
+.bottom.handle
+    left                (rulerSize / 2)
+    width               (rulerSize / 2)
+
+.bottom.border
+    left                rulerSize
+    right               0
+
+//    0000000  000  0000000  00000000  
+//   000       000     000   000       
+//   0000000   000    000    0000000   
+//        000  000   000     000       
+//   0000000   000  0000000  00000000  
+
+#width
+    position            absolute
+    text-align          right
+    right               1px
+    top                 2px
+    color               #fff
+    background          linear-gradient(to left,#222, #222 20px,rgba(0,0,0,0) 60px)
+    padding-left        60px
+    padding-right       2px
+
+#height
+    position            absolute
+    writing-mode        vertical-lr
+    text-align          right
+    bottom              1px
+    left                2px
+    color               #fff
+    background          linear-gradient(to top,#222, #222 20px,rgba(0,0,0,0) 60px)
+    padding-top         60px
+    padding-bottom      2px
+   
+#corner 
+    position            absolute
+    right               0
+    bottom              0
+    background          #222
+    border-radius       5px
+    width               10px
+    height              10px
+    
