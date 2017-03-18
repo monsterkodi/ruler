@@ -5,6 +5,7 @@
 # 000   000   0000000   0000000  00000000  000   000  
 {
 sw,sh,
+last,
 $}        = require './tools/tools'
 prefs     = require './tools/prefs'
 keyinfo   = require './tools/keyinfo'
@@ -23,6 +24,7 @@ horz      = null
 vert      = null
 horzLines = null
 vertLines = null
+origin    = 'outside'
 
 ipc.on 'setWinID', (event, id) => winMain id
    
@@ -41,6 +43,7 @@ winMain = (id) ->
     horzLines =$ '.horizontal.lines'
     vertLines =$ '.vertical.lines'
     ctrl.focus()
+    ctrl.onclick = toggleOrigin
     initRulers()
     resize()
     
@@ -82,8 +85,54 @@ initRulers = ->
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
 window.onresize = -> resize()
 resize = ->
-    $('width').textContent = win?.getBounds().width
-    $('height').textContent = win?.getBounds().height
+    o = origin == 'inside' and 22 or 0
+    $('width').textContent  = win?.getBounds().width  - o
+    $('height').textContent = win?.getBounds().height - o
+
+#  0000000   00000000   000   0000000   000  000   000  
+# 000   000  000   000  000  000        000  0000  000  
+# 000   000  0000000    000  000  0000  000  000 0 000  
+# 000   000  000   000  000  000   000  000  000  0000  
+#  0000000   000   000  000   0000000   000  000   000  
+
+toggleOrigin = ->
+    origin = origin == 'outside' and 'inside' or 'outside'
+    h = $('.origin.line.horizontal')
+    v = $('.origin.line.vertical')
+    if origin == 'inside'
+        horz.style.marginLeft = '22px'
+        vert.style.marginTop  = '22px'
+        h.style.right  = '0'
+        h.style.left   = 'unset'
+        v.style.top    = 'unset'
+        v.style.bottom = '0'
+    else
+        horz.style.marginLeft = '0'
+        vert.style.marginTop  = '0'
+        h.style.right  = 'unset'
+        h.style.left   = '0'
+        v.style.top    = '0'
+        v.style.bottom = 'unset'
+    resize()
+
+#  0000000  000000000  000   000  000      00000000  
+# 000          000      000 000   000      000       
+# 0000000      000       00000    000      0000000   
+#      000     000        000     000      000       
+# 0000000      000        000     0000000  00000000  
+
+toggleStyle = ->
+    link = $('style-link')
+    currentScheme = last link.href.split('/')
+    schemes = ['dark.css', 'bright.css']
+    nextSchemeIndex = ( schemes.indexOf(currentScheme) + 1) % schemes.length
+    newlink = elem 'link', 
+        rel:  'stylesheet'
+        type: 'text/css'
+        href: 'css/'+schemes[nextSchemeIndex]
+        id:   'style-link'
+
+    link.parentNode.replaceChild newlink, link
 
 # 00     00   0000000   000   000  00000000  
 # 000   000  000   000  000   000  000       
@@ -134,6 +183,8 @@ document.onkeydown = (event) ->
 
     switch key
         when 'left', 'right', 'up', 'down' then move key, mod
+        when 'o' then toggleOrigin()
+        when 'i' then toggleStyle()
     
     switch combo
         when 'right'            then return move  1,  0

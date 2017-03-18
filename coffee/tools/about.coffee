@@ -8,6 +8,7 @@
 pkg      = require '../../package.json'
 electron = require 'electron'
 opener   = require 'opener'
+
 Browser  = electron.BrowserWindow
 ipc      = electron.ipcMain
 

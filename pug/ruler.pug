@@ -4,6 +4,7 @@ html(lang="en")
         meta(charset='utf-8')
         title ruler
         link(rel='stylesheet' href='css/ruler.css' type='text/css')
+        link(rel='stylesheet' href='css/dark.css' type='text/css', id='style-link')
     body#body(tabindex=0)
         .right.border
         .bottom.border
@@ -17,4 +18,6 @@ html(lang="en")
         .bottom.handle
         #height
         #ctrl
+            .origin.line.horizontal._100
+            .origin.line.vertical._100
     script(src='ruler.js')

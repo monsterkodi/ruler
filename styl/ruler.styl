@@ -29,14 +29,12 @@ fill-abs()
 body
     fill-abs()
     margin              0
-    background          rgba(0,0,0,0.1)
-    color               #bbb
     overflow            hidden
     font-family         font
     font-size           10px
     -webkit-user-select none
     -webkit-app-region  no-drag
-    cursor              crosshair
+    cursor              crosshair    
 
 //  0000000  000000000  00000000   000      
 // 000          000     000   000  000      
@@ -47,8 +45,10 @@ body
 #ctrl
     position            absolute
     cursor              pointer    
-    -webkit-app-region  drag    
-    background          #222
+    -webkit-app-region  drag        
+    background-size     80% 80%
+    background-position 50% 50%
+    background-repeat   no-repeat    
     overflow            hidden
     pointer-events      all
     width               rulerSize
@@ -65,14 +65,12 @@ body
     cursor              pointer    
     pointer-events      all
     overflow            hidden
-    background          #222
     -webkit-app-region  drag
     
 #horz
     max-height          rulerSize
-    margin-left         rulerSize
+    
 #vert
-    margin-top          rulerSize
     max-width           rulerSize
 
 // 000      000  000   000  00000000  
@@ -84,7 +82,6 @@ body
 .lines
     position            relative
     overflow            visible
-    // border              1px solid red
 
 .lines.horizontal
     height              100%
@@ -96,7 +93,6 @@ body
 
 .line
     position            absolute
-    background          #444
     overflow            visible
 
 .line.horizontal
@@ -121,17 +117,6 @@ body
     &._100
         width           (rulerSize / 3)
 
-.line._10
-    background          #888
-.line._50
-    background          #888
-    & .num
-        color           #444
-.line._100
-    background          #aaa
-    & .num
-        color           #888
-
 .horizontal .num    
     text-align          center
     margin-top          - 13px
@@ -153,11 +138,9 @@ body
 
 .handle
     position            absolute
-    background          white
 
 .border
     position            absolute
-    background          rgba(128,128,128,0.25)
     
 .right
     right               0
@@ -194,8 +177,6 @@ body
     text-align          right
     right               1px
     top                 2px
-    color               #fff
-    background          linear-gradient(to left,#222, #222 20px,rgba(0,0,0,0) 60px)
     padding-left        60px
     padding-right       2px
 
@@ -205,8 +186,6 @@ body
     text-align          right
     bottom              1px
     left                2px
-    color               #fff
-    background          linear-gradient(to top,#222, #222 20px,rgba(0,0,0,0) 60px)
     padding-top         60px
     padding-bottom      2px
    
@@ -214,7 +193,6 @@ body
     position            absolute
     right               0
     bottom              0
-    background          #222
     border-radius       5px
     width               10px
     height              10px
