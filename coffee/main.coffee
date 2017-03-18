@@ -7,6 +7,7 @@
 electron      = require 'electron'
 noon          = require 'noon'
 prefs         = require './tools/prefs'
+about         = require './tools/about'
 log           = require './tools/log'
 pkg           = require '../package.json'
 app           = electron.app
@@ -55,14 +56,14 @@ createWindow = ->
         preloadWindow:   true
         resizable:       true
         center:          true
+        transparent:     true
+        alwaysOnTop:     true #!!!
         frame:           false
         show:            false
         fullscreenable:  false
         hasShadow:       false
         minimizable:     false
         maximizable:     false
-        transparent:     true
-        alwaysOnTop:     true #!!!
         width:           1000
         height:          1000
         minWidth:        22
@@ -83,6 +84,8 @@ createWindow = ->
 saveBounds = ->
     if win?
         prefs.set 'bounds', win.getBounds()
+
+showAbout = -> about img: "#{__dirname}/../img/about.png"
             
 app.on 'window-all-closed', (event) -> event.preventDefault()
 
@@ -108,7 +111,8 @@ app.on 'ready', ->
         label: app.getName()
         submenu: [
             label: "About #{pkg.name}"
-            click: -> clipboard.writeText "#{pkg.name} v#{pkg.version}"
+            accelerator: 'Cmd+.'
+            click: -> showAbout()
         ,            
             type: 'separator'
         ,

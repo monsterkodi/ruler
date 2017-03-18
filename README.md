@@ -1,6 +1,3 @@
 ![ruler](img/banner.png)
 
-![ruler](img/about.png)
-
-
-
+![ruler](img/shot.png)

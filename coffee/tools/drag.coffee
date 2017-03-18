@@ -6,8 +6,9 @@
 
 _ = require 'lodash'
 
-{def, absPos} = require './tools'
-log           = require './log'
+{def} = require './tools'
+pos   = require './pos'
+log   = require './log'
 
 error = -> console.error "ERROR: " + ([].slice.call arguments, 0).join " "
     
@@ -46,10 +47,10 @@ class Drag
         
         return if @dragging or not @listening
         @dragging = true
-        @startPos = absPos event
-        @pos      = absPos event
+        @startPos = pos event
+        @pos      = pos event
         @onStart @, event if @onStart?
-        @lastPos  = absPos event
+        @lastPos  = pos event
                 
         event.preventDefault()
 
@@ -60,7 +61,7 @@ class Drag
 
         return if not @dragging
 
-        @pos   = absPos event
+        @pos   = pos event
         @delta = @lastPos.to @pos
         @deltaSum = @startPos.to @pos
         

@@ -7,6 +7,14 @@
 class Pos
 
     constructor: (@x, @y) ->
+        if @x?.clientX?
+            event = @x
+            if isNaN window.scrollX
+                @x = event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft
+                @y = event.clientY + document.documentElement.scrollTop + document.body.scrollTop
+            else
+                @x = event.clientX + window.scrollX
+                @y = event.clientY + window.scrollY
         
     copy: => new Pos @x, @y
 

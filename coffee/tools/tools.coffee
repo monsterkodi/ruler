@@ -4,7 +4,6 @@
 #    000     000   000  000   000  000           000
 #    000      0000000    0000000   0000000  0000000 
 
-pos    = require './pos'
 log    = require './log'
 _      = require 'lodash'
 path   = require 'path'
@@ -13,26 +12,20 @@ fs     = require 'fs'
 
 module.exports = 
 
-    # #  0000000   00000000   00000000    0000000   000   000
-    # # 000   000  000   000  000   000  000   000   000 000 
-    # # 000000000  0000000    0000000    000000000    00000  
-    # # 000   000  000   000  000   000  000   000     000   
-    # # 000   000  000   000  000   000  000   000     000   
+    # 0000000    000   0000000  000000000
+    # 000   000  000  000          000   
+    # 000   000  000  000          000   
+    # 000   000  000  000          000   
+    # 0000000    000   0000000     000   
 
-    # last:  (a) -> 
-        # if not _.isArray a
-            # return a
-        # if a?.length
-            # return a[a.length-1]
-        # null
-#         
-    # first: (a) ->
-        # if not _.isArray a
-            # return a
-        # if a?.length
-            # return a[0]
-        # null
-    
+    def: (c,d) ->
+        if c?
+            _.defaults(_.clone(c), d)
+        else if d?
+            _.clone(d)
+        else
+            {}
+
     # 000   000   0000000   000      000   000  00000000
     # 000   000  000   000  000      000   000  000     
     #  000 000   000000000  000      000   000  0000000 
@@ -123,14 +116,6 @@ module.exports =
             e.querySelector idOrClass
         else
             document.getElementById idOrClass
-
-    absPos: (event) ->
-        event = if event? then event else window.event
-        if isNaN window.scrollX
-            return pos(event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft,
-                       event.clientY + document.documentElement.scrollTop + document.body.scrollTop)
-        else
-            return pos(event.clientX + window.scrollX, event.clientY + window.scrollY)
 
     childIndex: (e) -> Array.prototype.indexOf.call(e.parentNode.childNodes, e)
 

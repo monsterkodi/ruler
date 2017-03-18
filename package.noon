@@ -26,4 +26,5 @@ dependencies
                 keycode         ^2.1.8
                 lodash          ^4.17.4
                 noon            ^1.0.14
+                opener          ^1.4.3
                 write-file-atomic  ^1.3.1
