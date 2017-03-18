@@ -8,12 +8,14 @@ sw,sh,
 last,
 $}        = require './tools/tools'
 prefs     = require './tools/prefs'
+pos       = require './tools/pos'
 keyinfo   = require './tools/keyinfo'
 drag      = require './tools/drag'
 elem      = require './tools/elem'
 str       = require './tools/str'
 _         = require 'lodash'
 electron  = require 'electron'
+screen    = electron.screen
 ipc       = electron.ipcRenderer
 remote    = electron.remote
 browser   = remote.BrowserWindow
@@ -24,7 +26,9 @@ horz      = null
 vert      = null
 horzLines = null
 vertLines = null
+mousePos  = pos 0, 0
 origin    = 'outside'
+offset    = 0
 
 ipc.on 'setWinID', (event, id) => winMain id
    
@@ -36,7 +40,7 @@ ipc.on 'setWinID', (event, id) => winMain id
 
 winMain = (id) ->
     win = browser.fromId id 
-    # win?.webContents.openDevTools()
+    win?.webContents.openDevTools()
     horz =$ 'horz' 
     vert =$ 'vert'
     ctrl =$ 'ctrl'
@@ -44,9 +48,27 @@ winMain = (id) ->
     vertLines =$ '.vertical.lines'
     ctrl.focus()
     ctrl.onclick = toggleOrigin
-    initRulers()
-    resize()
+        
+    screen.on 'display-metrics-changed', onDisplayChanged
+    window.requestAnimationFrame animationFrame
     
+    initRulers()
+    initDrag()
+    resize()
+ 
+animationFrame = ->
+    screenPos = pos screen.getCursorScreenPoint()
+    if not mousePos.equals screenPos
+        mousePos = screenPos
+        onMousePos mousePos
+    window.requestAnimationFrame animationFrame
+    
+# 00000000   000   000  000      00000000  00000000    0000000  
+# 000   000  000   000  000      000       000   000  000       
+# 0000000    000   000  000      0000000   0000000    0000000   
+# 000   000  000   000  000      000       000   000       000  
+# 000   000   0000000   0000000  00000000  000   000  0000000   
+
 initRulers = ->
     for x in [0..5000/5]
         
@@ -76,6 +98,71 @@ initRulers = ->
                 
         vertLines.appendChild line
 
+# 0000000    00000000    0000000    0000000   
+# 000   000  000   000  000   000  000        
+# 000   000  0000000    000000000  000  0000  
+# 000   000  000   000  000   000  000   000  
+# 0000000    000   000  000   000   0000000   
+
+initDrag = ->
+    
+    new drag
+        target:  document.body
+        cursor:  'crosshair'
+        onStart: (drag, event) =>
+
+            absPos = pos event
+            
+            info = elem id: 'info', children: [
+                elem id: 'posx', text: "x #{absPos.x - offset}"
+                elem id: 'posy', text: "y #{absPos.y - offset}"
+                elem id: 'rctw', text: "w 0"
+                elem id: 'rcth', text: "h 0"
+                ]
+            info.style.left = "#{absPos.x}px"
+            info.style.top  = "#{absPos.y}px"
+            document.body.appendChild info
+            
+            rect = elem id: 'rect'
+            rect.style.left = "#{absPos.x}px"
+            rect.style.top  = "#{absPos.y}px"
+            rect.style.width = "#{1}px"
+            rect.style.height  = "#{1}px"
+            document.body.appendChild rect
+            
+        onMove: (drag, event) => 
+
+            absPos = pos event
+            
+            info =$ 'info'
+            posx =$ 'posx'
+            posy =$ 'posy'
+            rect =$ 'rect'
+            rctw =$ 'rctw'
+            rcth =$ 'rcth'
+            
+            w = drag.deltaSum.x
+            h = drag.deltaSum.y
+                        
+            info.style.left = "#{absPos.x}px"
+            info.style.top  = "#{absPos.y}px"
+
+            tl = drag.startPos.min drag.pos
+            rect.style.left   = "#{tl.x}px"            
+            rect.style.top    = "#{tl.y}px"
+            rect.style.width  = "#{Math.abs w}px"
+            rect.style.height = "#{Math.abs h}px"
+            
+            absPos.sub pos offset, offset
+            posx.textContent = "x #{absPos.x}"
+            posy.textContent = "y #{absPos.y}"
+            rctw.textContent = "w #{w}"
+            rcth.textContent = "h #{h}"
+            
+        onStop: =>
+            $('rect')?.remove()
+            $('info')?.remove()
+
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
 # 0000000    0000000   0000000   000    000    0000000 
@@ -85,9 +172,11 @@ initRulers = ->
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
 window.onresize = -> resize()
 resize = ->
-    o = origin == 'inside' and 22 or 0
-    $('width').textContent  = win?.getBounds().width  - o
-    $('height').textContent = win?.getBounds().height - o
+    $('width').textContent  = win?.getBounds().width  - offset
+    $('height').textContent = win?.getBounds().height - offset
+
+onDisplayChanged = (event, display, changes) ->
+    log "display: #{display}", changes
 
 #  0000000   00000000   000   0000000   000  000   000  
 # 000   000  000   000  000  000        000  0000  000  
@@ -97,18 +186,17 @@ resize = ->
 
 toggleOrigin = ->
     origin = origin == 'outside' and 'inside' or 'outside'
+    offset = origin == 'inside' and 22 or 0
     h = $('.origin.line.horizontal')
     v = $('.origin.line.vertical')
+    horz.style.marginLeft = "#{offset}px"
+    vert.style.marginTop  = "#{offset}px"
     if origin == 'inside'
-        horz.style.marginLeft = '22px'
-        vert.style.marginTop  = '22px'
         h.style.right  = '0'
         h.style.left   = 'unset'
         v.style.top    = 'unset'
         v.style.bottom = '0'
     else
-        horz.style.marginLeft = '0'
-        vert.style.marginTop  = '0'
         h.style.right  = 'unset'
         h.style.left   = '0'
         v.style.top    = '0'
@@ -170,6 +258,23 @@ move = (key, mod) ->
         
     win?.setBounds b
 
+# 00     00   0000000   000   000   0000000  00000000  
+# 000   000  000   000  000   000  000       000       
+# 000000000  000   000  000   000  0000000   0000000   
+# 000 0 000  000   000  000   000       000  000       
+# 000   000   0000000    0000000   0000000   00000000  
+
+onMousePos = (p) ->
+    b = win?.getBounds()
+    
+    x = p.x - b.x - offset
+    y = p.y - b.y - offset
+        
+    h = $('.needle.line.horizontal')
+    v = $('.needle.line.vertical')
+    h.style.left = "#{x}px"
+    v.style.top  = "#{y}px"
+    
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
 # 0000000    0000000     00000  
@@ -183,14 +288,14 @@ document.onkeydown = (event) ->
 
     switch key
         when 'left', 'right', 'up', 'down' then move key, mod
-        when 'o' then toggleOrigin()
-        when 'i' then toggleStyle()
     
     switch combo
         when 'right'            then return move  1,  0
         when 'up'               then return move  0, -1
         when 'down'             then return move  0,  1
         when 'esc'              then return win?.close()
+        when 'i'                then toggleStyle()
+        when 'o'                then toggleOrigin()
         when 'command+alt+i'    then return win?.webContents.openDevTools()
         
 

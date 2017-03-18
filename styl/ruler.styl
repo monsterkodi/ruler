@@ -53,7 +53,7 @@ body
     pointer-events      all
     width               rulerSize
     height              rulerSize
-
+    
 // 00000000   000   000  000      00000000  00000000   
 // 000   000  000   000  000      000       000   000  
 // 0000000    000   000  000      0000000   0000000    
@@ -62,10 +62,8 @@ body
 
 .ruler
     fill-abs()
-    cursor              pointer    
     pointer-events      all
     overflow            hidden
-    -webkit-app-region  drag
     
 #horz
     max-height          rulerSize
@@ -103,8 +101,9 @@ body
         height          (rulerSize / 4)
     &._50
         height          (rulerSize / 3)
+    &.needle
     &._100
-        height          (rulerSize / 3)
+        height          (rulerSize / 3)    
 
 .line.vertical
     right 0
@@ -114,6 +113,7 @@ body
         width           (rulerSize / 4)
     &._50
         width           (rulerSize / 3)
+    &.needle
     &._100
         width           (rulerSize / 3)
 
@@ -171,6 +171,16 @@ body
 //   0000000   000    000    0000000   
 //        000  000   000     000       
 //   0000000   000  0000000  00000000  
+
+#info
+    position            absolute
+    padding             4px
+    margin-left        10px
+
+#rect
+    position            absolute
+    box-sizing          border-box
+    border              1px solid rgba(128, 128, 128, 0.5)
 
 #width
     position            absolute

@@ -4,6 +4,8 @@
 #000        000   000       000
 #000         0000000   0000000 
 
+{clamp} = require './tools'
+
 class Pos
 
     constructor: (@x, @y) ->
@@ -15,6 +17,9 @@ class Pos
             else
                 @x = event.clientX + window.scrollX
                 @y = event.clientY + window.scrollY
+        else if not @y? and Pos.isPos @x
+            @y = @x.y
+            @x = @x.x
         
     copy: => new Pos @x, @y
 
@@ -57,8 +62,7 @@ class Pos
     square:         => (@x * @x) + (@y * @y)
     distSquare: (o) => @minus(o).square()
     dist:       (o) => Math.sqrt @distSquare(o)
-    same:       (o) => @x == o?.x and @y == o?.y
-    notSame:    (o) => @x != o?.x or  @y != o?.y
+    equals:     (o) => @x == o?.x and @y == o?.y
 
     check: =>
         newPos = @copy()
@@ -70,31 +74,32 @@ class Pos
         s  = ("<x:#{@x} " if @x?) or "<NaN "
         s += ("y:#{@y}>" if @y?) or "NaN>"
 
+    @isPos: (o) -> o.x? and o.y? and Number.isInteger(o.x) and Number.isInteger(o.y)
+    
     #_________________________________________________________ destructive
     
-    scale: (val) =>
+    scale: (val) ->
         @x *= val
         @y *= val
         @
 
-    mul: (other) =>
+    mul: (other) ->
         @x *= other.x
         @y *= other.y
         @
 
-    add: (other) =>
+    add: (other) ->
         @x += other.x
         @y += other.y
         @
 
-    sub: (other) =>
+    sub: (other) ->
         @x -= other.x
         @y -= other.y
         @
 
-    clamp: (lower, upper) =>
-        if lower? and upper?
-            {clamp} = require './tools'
+    clamp: (lower, upper) ->
+        if lower? and upper?            
             @x = clamp(lower.x, upper.x, @x)
             @y = clamp(lower.y, upper.y, @y)
         @
