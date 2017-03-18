@@ -18,7 +18,6 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 win           = undefined
 tray          = undefined
-debug         = false
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -50,6 +49,7 @@ showWindow = ->
     app.dock.show()
     
 createWindow = ->
+    log 'hello'
     cwd = __dirname
     win = new BrowserWindow
         backgroundColor: '#00000000'
@@ -75,11 +75,19 @@ createWindow = ->
     bounds = prefs.get 'bounds'
     win.setBounds bounds if bounds?
         
-    win.webContents.openDevTools() if debug
     win.on 'closed', -> win = null
     win.on 'close',  -> app.dock.hide()
+    win.on 'blur',   onBlur
+    win.on 'focus',  onFocus
     app.dock.show()
     win
+
+onBlur = -> 
+    log 'onBlur'
+    win?.setIgnoreMouseEvents true
+onFocus = -> 
+    log 'onFocus'
+    win?.setIgnoreMouseEvents false
 
 saveBounds = ->
     if win?

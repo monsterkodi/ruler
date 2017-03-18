@@ -29,12 +29,15 @@ fill-abs()
 body
     fill-abs()
     margin              0
+    background          rgba(128,128,128,0.1)
+    box-sizing          border-box
+    border              none
     overflow            hidden
     font-family         font
     font-size           10px
     -webkit-user-select none
     -webkit-app-region  no-drag
-    cursor              crosshair    
+    // cursor              crosshair    
 
 //  0000000  000000000  00000000   000      
 // 000          000     000   000  000      
@@ -104,6 +107,9 @@ body
     &.needle
     &._100
         height          (rulerSize / 3)    
+    &.cursor
+        height          11px
+        top             -5px
 
 .line.vertical
     right 0
@@ -116,6 +122,9 @@ body
     &.needle
     &._100
         width           (rulerSize / 3)
+    &.cursor
+        width           11px
+        left            -5px 
 
 .horizontal .num    
     text-align          center
@@ -136,11 +145,14 @@ body
 // 000   000  000   000  000  0000  000   000  000      000       
 // 000   000  000   000  000   000  0000000    0000000  00000000  
 
+.border
 .handle
+#cursor
+    position            absolute
     position            absolute
 
-.border
-    position            absolute
+#cursor .line
+    background          rgba(128,128,128,0.5)
     
 .right
     right               0
@@ -175,12 +187,11 @@ body
 #info
     position            absolute
     padding             4px
-    margin-left        10px
+    // margin-left        10px
 
 #rect
     position            absolute
-    box-sizing          border-box
-    border              1px solid rgba(128, 128, 128, 0.5)
+    background          rgba(128,128,128,0.2)
 
 #width
     position            absolute

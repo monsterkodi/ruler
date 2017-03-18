@@ -5,6 +5,7 @@
 #000         0000000   0000000 
 
 {clamp} = require './tools'
+log  = require './log'
 
 class Pos
 
@@ -15,8 +16,8 @@ class Pos
                 @x = event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft
                 @y = event.clientY + document.documentElement.scrollTop + document.body.scrollTop
             else
-                @x = event.clientX + window.scrollX
-                @y = event.clientY + window.scrollY
+                @x = event.clientX + window.scrollX + 1
+                @y = event.clientY + window.scrollY + 1
         else if not @y? and Pos.isPos @x
             @y = @x.y
             @x = @x.x

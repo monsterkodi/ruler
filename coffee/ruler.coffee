@@ -48,6 +48,7 @@ winMain = (id) ->
     vertLines =$ '.vertical.lines'
     ctrl.focus()
     ctrl.onclick = toggleOrigin
+    ctrl.onmousedown = (e) -> e.stopPropagation()
         
     screen.on 'display-metrics-changed', onDisplayChanged
     window.requestAnimationFrame animationFrame
@@ -108,7 +109,7 @@ initDrag = ->
     
     new drag
         target:  document.body
-        cursor:  'crosshair'
+        cursor:  'none'
         onStart: (drag, event) =>
 
             absPos = pos event
@@ -116,18 +117,18 @@ initDrag = ->
             info = elem id: 'info', children: [
                 elem id: 'posx', text: "x #{absPos.x - offset}"
                 elem id: 'posy', text: "y #{absPos.y - offset}"
-                elem id: 'rctw', text: "w 0"
-                elem id: 'rcth', text: "h 0"
+                elem id: 'rctw', text: "w 1"
+                elem id: 'rcth', text: "h 1"
                 ]
             info.style.left = "#{absPos.x}px"
             info.style.top  = "#{absPos.y}px"
             document.body.appendChild info
             
             rect = elem id: 'rect'
-            rect.style.left = "#{absPos.x}px"
-            rect.style.top  = "#{absPos.y}px"
-            rect.style.width = "#{1}px"
-            rect.style.height  = "#{1}px"
+            rect.style.left = "#{absPos.x-1}px"
+            rect.style.top  = "#{absPos.y-1}px"
+            rect.style.width = "1px"
+            rect.style.height  = "1px"
             document.body.appendChild rect
             
         onMove: (drag, event) => 
@@ -148,16 +149,16 @@ initDrag = ->
             info.style.top  = "#{absPos.y}px"
 
             tl = drag.startPos.min drag.pos
-            rect.style.left   = "#{tl.x}px"            
-            rect.style.top    = "#{tl.y}px"
-            rect.style.width  = "#{Math.abs w}px"
-            rect.style.height = "#{Math.abs h}px"
+            rect.style.left   = "#{tl.x-1}px"            
+            rect.style.top    = "#{tl.y-1}px"
+            rect.style.width  = "#{Math.abs(w)+1}px"
+            rect.style.height = "#{Math.abs(h)+1}px"
             
             absPos.sub pos offset, offset
             posx.textContent = "x #{absPos.x}"
             posy.textContent = "y #{absPos.y}"
-            rctw.textContent = "w #{w}"
-            rcth.textContent = "h #{h}"
+            rctw.textContent = "w #{w+(w < 0 and -1 or 1)}"
+            rcth.textContent = "h #{h+(h < 0 and -1 or 1)}"
             
         onStop: =>
             $('rect')?.remove()
@@ -187,8 +188,8 @@ onDisplayChanged = (event, display, changes) ->
 toggleOrigin = ->
     origin = origin == 'outside' and 'inside' or 'outside'
     offset = origin == 'inside' and 22 or 0
-    h = $('.origin.line.horizontal')
-    v = $('.origin.line.vertical')
+    h =$ '.origin.line.horizontal'
+    v =$ '.origin.line.vertical'
     horz.style.marginLeft = "#{offset}px"
     vert.style.marginTop  = "#{offset}px"
     if origin == 'inside'
@@ -266,15 +267,19 @@ move = (key, mod) ->
 
 onMousePos = (p) ->
     b = win?.getBounds()
-    
-    x = p.x - b.x - offset
-    y = p.y - b.y - offset
+    log "#{p.x} #{p.y}"
+    x = p.x - b.x 
+    y = p.y - b.y 
         
-    h = $('.needle.line.horizontal')
-    v = $('.needle.line.vertical')
-    h.style.left = "#{x}px"
-    v.style.top  = "#{y}px"
+    h =$ '.needle.line.horizontal' 
+    v =$ '.needle.line.vertical' 
+    h.style.left = "#{x - offset}px"
+    v.style.top  = "#{y - offset}px"
     
+    c =$ 'cursor' 
+    c.style.left = "#{x}px"
+    c.style.top  = "#{y}px"
+
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
 # 0000000    0000000     00000  
