@@ -5,6 +5,7 @@
 # 000   000   0000000   0000000  00000000  000   000  
 {
 sw,sh,
+setStyle,
 last,
 $}        = require './tools/tools'
 prefs     = require './tools/prefs'
@@ -30,7 +31,8 @@ mousePos  = pos 0, 0
 origin    = 'outside'
 offset    = 0
 
-ipc.on 'setWinID', (event, id) => winMain id
+ipc.on 'setWinID', (event, id) -> winMain id
+ipc.on 'setActive', (event, active) -> setActive active
    
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -40,7 +42,9 @@ ipc.on 'setWinID', (event, id) => winMain id
 
 winMain = (id) ->
     win = browser.fromId id 
-    win?.webContents.openDevTools()
+    
+    # win?.webContents.openDevTools() 
+    
     horz =$ 'horz' 
     vert =$ 'vert'
     ctrl =$ 'ctrl'
@@ -63,6 +67,14 @@ animationFrame = ->
         mousePos = screenPos
         onMousePos mousePos
     window.requestAnimationFrame animationFrame
+
+setActive = (active) ->
+    if active
+        setStyle "#ctrl", "background-blend-mode", "normal"
+        setStyle "#body", "opacity", 1
+    else
+        setStyle "#ctrl", "background-blend-mode", "soft-light"
+        setStyle "#body", "opacity", 0.5
     
 # 00000000   000   000  000      00000000  00000000    0000000  
 # 000   000  000   000  000      000       000   000  000       
@@ -267,7 +279,7 @@ move = (key, mod) ->
 
 onMousePos = (p) ->
     b = win?.getBounds()
-    log "#{p.x} #{p.y}"
+
     x = p.x - b.x 
     y = p.y - b.y 
         
@@ -279,6 +291,11 @@ onMousePos = (p) ->
     c =$ 'cursor' 
     c.style.left = "#{x}px"
     c.style.top  = "#{y}px"
+    
+    nx =$ '.needle.horizontal .num'
+    ny =$ '.needle.vertical .num'
+    nx.textContent = x-offset+1
+    ny.textContent = y-offset+1
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

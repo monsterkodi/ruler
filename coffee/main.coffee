@@ -49,7 +49,6 @@ showWindow = ->
     app.dock.show()
     
 createWindow = ->
-    log 'hello'
     cwd = __dirname
     win = new BrowserWindow
         backgroundColor: '#00000000'
@@ -83,11 +82,11 @@ createWindow = ->
     win
 
 onBlur = -> 
-    log 'onBlur'
     win?.setIgnoreMouseEvents true
+    win?.webContents.send 'setActive', false
 onFocus = -> 
-    log 'onFocus'
     win?.setIgnoreMouseEvents false
+    win?.webContents.send 'setActive', true
 
 saveBounds = ->
     if win?
