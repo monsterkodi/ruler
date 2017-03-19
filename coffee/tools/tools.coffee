@@ -65,10 +65,18 @@ module.exports =
     # 000        000   000     000     000   000
     # 000        000   000     000     000   000
     
-    resolve:   (p) -> path.normalize path.resolve p.replace /^\~/, process.env.HOME
     unresolve: (p) -> p.replace os.homedir(), "~"    
     fileName:  (p) -> path.basename p, path.extname p
     extName:   (p) -> path.extname(p).slice 1
+    resolve:   (p) -> 
+        i = p.indexOf '$'
+        while i >= 0
+            for k,v of process.env
+                if k == p.slice i+1, i+1+k.length
+                    p = p.slice(0, i) + v + p.slice(i+k.length+1)
+                    i = p.indexOf '$'
+                    break
+        path.normalize path.resolve p.replace /^\~/, process.env.HOME
     
     fileExists: (file) ->
         try

@@ -4,14 +4,17 @@
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 
-electron      = require 'electron'
-noon          = require 'noon'
+{resolve}     = require './tools/tools'
 prefs         = require './tools/prefs'
 about         = require './tools/about'
 log           = require './tools/log'
 pkg           = require '../package.json'
+childp        = require 'child_process'
+electron      = require 'electron'
+noon          = require 'noon'
 app           = electron.app
 BrowserWindow = electron.BrowserWindow
+nativeImage   = electron.nativeImage
 Tray          = electron.Tray
 Menu          = electron.Menu
 clipboard     = electron.clipboard
@@ -29,6 +32,7 @@ scheme        = 'dark'
 ipc.on 'toggleMaximize', -> if win?.isMaximized() then win?.unmaximize() else win?.maximize()
 ipc.on 'closeWin',       -> win?.close()
 ipc.on 'setScheme', (event, arg) -> scheme = arg
+ipc.on 'copyImage', (event, arg) -> copyImage arg
     
 #000   000  000  000   000  0000000     0000000   000   000
 #000 0 000  000  0000  000  000   000  000   000  000 0 000
@@ -98,6 +102,28 @@ showAbout = ->
     about 
         img: "#{__dirname}/../img/about.png"
         background: scheme == 'bright' and '#fff' or "#222"
+
+#  0000000   0000000   00000000   000   000  000  00     00   0000000    0000000   00000000  
+# 000       000   000  000   000   000 000   000  000   000  000   000  000        000       
+# 000       000   000  00000000     00000    000  000000000  000000000  000  0000  0000000   
+# 000       000   000  000           000     000  000 0 000  000   000  000   000  000       
+#  0000000   0000000   000           000     000  000   000  000   000   0000000   00000000  
+
+copyImage = (rect) ->
+    tmpFile = resolve '$TMPDIR/clippo.png'
+    rect.x += win.getBounds().x
+    rect.y += win.getBounds().y
+    win.hide()
+    childp.exec "screencapture -T 0 #{tmpFile}", (err) -> 
+        win.show()
+        if err? then log "[ERROR] screencapture: #{err}"
+        img = nativeImage.createFromPath tmpFile
+        rect.x *= 2
+        rect.y *= 2
+        rect.width *= 2
+        rect.height *= 2
+        img = img.crop rect
+        clipboard.writeImage img
             
 app.on 'window-all-closed', (event) -> event.preventDefault()
 

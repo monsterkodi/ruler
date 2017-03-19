@@ -211,6 +211,14 @@ resize = ->
     $('width').textContent  = win?.getBounds().width  - offset
     $('height').textContent = win?.getBounds().height - offset
 
+copyImage = -> 
+    if $('rect')?
+        br = $('rect').getBoundingClientRect()
+        ipc.send 'copyImage', x:br.left, y:br.top, width:br.width, height:br.height
+    else
+        br = win.getBounds()
+        ipc.send 'copyImage', x:offset, y:offset, width:br.width - offset, height:br.height - offset
+
 #  0000000   00000000   000   0000000   000  000   000  
 # 000   000  000   000  000  000        000  0000  000  
 # 000   000  0000000    000  000  0000  000  000 0 000  
@@ -338,6 +346,7 @@ document.onkeydown = (event) ->
         when 'left', 'right', 'up', 'down' then move key, mod
     
     switch combo
+        when 'command+c', 'c'   then return copyImage()
         when 'right'            then return move  1,  0
         when 'up'               then return move  0, -1
         when 'down'             then return move  0,  1
