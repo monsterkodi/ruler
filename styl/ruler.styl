@@ -29,7 +29,6 @@ fill-abs()
 body
     fill-abs()
     margin              0
-    background          rgba(128,128,128,0.1)
     box-sizing          border-box
     border              none
     overflow            hidden
@@ -37,6 +36,17 @@ body
     font-size           10px
     -webkit-user-select none
     -webkit-app-region  no-drag
+    pointer-events      none
+    cursor              none
+
+#area
+    position            absolute
+    left                rulerSize
+    top                 rulerSize
+    right               0
+    bottom              0
+    pointer-events      all
+    cursor              none
 
 //  0000000  000000000  00000000   000      
 // 000          000     000   000  000      
@@ -65,8 +75,10 @@ body
 
 .ruler
     fill-abs()
+    -webkit-app-region  drag        
     pointer-events      all
     overflow            hidden
+    cursor              default
     
 #horz
     max-height          rulerSize
@@ -200,19 +212,19 @@ body
 #width
     position            absolute
     text-align          right
-    right               1px
+    right               0
     top                 2px
     padding-left        60px
-    padding-right       2px
+    padding-right       3px
 
 #height
     position            absolute
     writing-mode        vertical-lr
     text-align          right
-    bottom              1px
+    bottom              0
     left                2px
     padding-top         60px
-    padding-bottom      2px
+    padding-bottom      3px
    
 #corner 
     position            absolute

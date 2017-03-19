@@ -37,14 +37,11 @@ class Drag
 
         @dragging  = false
         @listening = false
-        @handle    = document.getElementById(@handle) if typeof (@handle) is 'string'
-        @handle    = @target unless @handle?
-        @handle.style.cursor = @cursor
+        @handle    = document.getElementById(@handle) if typeof @handle  is 'string'
+        @handle    = @target if not @handle?
         @activate() if @active
-        return
 
     dragStart: (event) =>
-        
         return if @dragging or not @listening
         @dragging = true
         @startPos = pos event
@@ -81,14 +78,12 @@ class Drag
         delete @startPos
         @onStop this, event if @onStop? and event?
         @dragging = false
-        return
 
     activate: =>
         
         return if @listening
         @listening = true
         @handle.addEventListener 'mousedown', @dragStart
-        return
 
     deactivate: =>
 
@@ -96,6 +91,5 @@ class Drag
         @handle.removeEventListener 'mousedown', @dragStart
         @listening = false
         @dragStop() if @dragging
-        return
 
 module.exports = Drag

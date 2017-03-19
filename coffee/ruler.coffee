@@ -10,17 +10,18 @@ last,
 $}        = require './tools/tools'
 prefs     = require './tools/prefs'
 pos       = require './tools/pos'
+log       = require './tools/log'
 keyinfo   = require './tools/keyinfo'
 drag      = require './tools/drag'
 elem      = require './tools/elem'
 str       = require './tools/str'
 _         = require 'lodash'
 electron  = require 'electron'
+path      = require 'path'
 screen    = electron.screen
 ipc       = electron.ipcRenderer
 remote    = electron.remote
 browser   = remote.BrowserWindow
-log       = -> console.log (str(s) for s in [].slice.call arguments, 0).join " "
 win       = null
 ctrl      = null
 horz      = null
@@ -28,6 +29,8 @@ vert      = null
 horzLines = null
 vertLines = null
 mousePos  = pos 0, 0
+skipMouse = false
+skipTimer = null
 origin    = 'outside'
 offset    = 0
 
@@ -42,6 +45,7 @@ ipc.on 'setActive', (event, active) -> setActive active
 
 winMain = (id) ->
     win = browser.fromId id 
+    win.on 'move', -> doSkipMouse()
     
     # win?.webContents.openDevTools() 
     
@@ -51,22 +55,42 @@ winMain = (id) ->
     horzLines =$ '.horizontal.lines'
     vertLines =$ '.vertical.lines'
     ctrl.focus()
-    ctrl.onclick = toggleOrigin
-    ctrl.onmousedown = (e) -> e.stopPropagation()
+    stopEvent = (e) -> 
+        doSkipMouse 0
+        e.preventDefault()
+        e.stopPropagation() 
+        e.stopImmediatePropagation()
         
-    screen.on 'display-metrics-changed', onDisplayChanged
+    horz.addEventListener 'mousedown', stopEvent, true
+    vert.addEventListener 'mousedown', stopEvent, true
+    ctrl.addEventListener 'mousedown', stopEvent, true
+    horz.addEventListener 'mouseup', -> doSkipMouse 10
+    vert.addEventListener 'mouseup', -> doSkipMouse 10
+    ctrl.addEventListener 'mouseup', -> doSkipMouse 10
+        
     window.requestAnimationFrame animationFrame
     
+    setOrigin 'outside'
     initRulers()
     initDrag()
     resize()
  
 animationFrame = ->
     screenPos = pos screen.getCursorScreenPoint()
-    if not mousePos.equals screenPos
+    if not skipMouse and not mousePos.equals screenPos
         mousePos = screenPos
         onMousePos mousePos
     window.requestAnimationFrame animationFrame
+
+doSkipMouse = (delay=500) ->
+    skipMouse = true
+    clearTimeout skipTimer
+    updateMouse = ->
+        skipMouse = false
+        mousePos = pos screen.getCursorScreenPoint()
+        onMousePos mousePos
+    if delay
+        skipTimer = setTimeout updateMouse, delay 
 
 setActive = (active) ->
     if active
@@ -74,7 +98,7 @@ setActive = (active) ->
         setStyle "#body", "opacity", 1
     else
         setStyle "#ctrl", "background-blend-mode", "soft-light"
-        setStyle "#body", "opacity", 0.5
+        setStyle "#body", "opacity", 0.65
     
 # 00000000   000   000  000      00000000  00000000    0000000  
 # 000   000  000   000  000      000       000   000  000       
@@ -121,7 +145,6 @@ initDrag = ->
     
     new drag
         target:  document.body
-        cursor:  'none'
         onStart: (drag, event) =>
 
             absPos = pos event
@@ -188,9 +211,6 @@ resize = ->
     $('width').textContent  = win?.getBounds().width  - offset
     $('height').textContent = win?.getBounds().height - offset
 
-onDisplayChanged = (event, display, changes) ->
-    log "display: #{display}", changes
-
 #  0000000   00000000   000   0000000   000  000   000  
 # 000   000  000   000  000  000        000  0000  000  
 # 000   000  0000000    000  000  0000  000  000 0 000  
@@ -198,7 +218,10 @@ onDisplayChanged = (event, display, changes) ->
 #  0000000   000   000  000   0000000   000  000   000  
 
 toggleOrigin = ->
-    origin = origin == 'outside' and 'inside' or 'outside'
+    setOrigin origin == 'outside' and 'inside' or 'outside'
+    
+setOrigin = (o) ->
+    origin = o
     offset = origin == 'inside' and 22 or 0
     h =$ '.origin.line.horizontal'
     v =$ '.origin.line.vertical'
@@ -211,8 +234,8 @@ toggleOrigin = ->
         v.style.bottom = '0'
     else
         h.style.right  = 'unset'
-        h.style.left   = '0'
-        v.style.top    = '0'
+        h.style.left   = '-1px'
+        v.style.top    = '-1px'
         v.style.bottom = 'unset'
     resize()
 
@@ -227,10 +250,12 @@ toggleStyle = ->
     currentScheme = last link.href.split('/')
     schemes = ['dark.css', 'bright.css']
     nextSchemeIndex = ( schemes.indexOf(currentScheme) + 1) % schemes.length
+    nextScheme = schemes[nextSchemeIndex]
+    ipc.send 'setScheme', path.basename nextScheme, '.css'
     newlink = elem 'link', 
         rel:  'stylesheet'
         type: 'text/css'
-        href: 'css/'+schemes[nextSchemeIndex]
+        href: 'css/'+nextScheme
         id:   'style-link'
 
     link.parentNode.replaceChild newlink, link
@@ -278,6 +303,7 @@ move = (key, mod) ->
 # 000   000   0000000    0000000   0000000   00000000  
 
 onMousePos = (p) ->
+    return if skipMouse
     b = win?.getBounds()
 
     x = p.x - b.x 

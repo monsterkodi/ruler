@@ -18,6 +18,7 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 win           = undefined
 tray          = undefined
+scheme        = 'dark'
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -27,6 +28,7 @@ tray          = undefined
 
 ipc.on 'toggleMaximize', -> if win?.isMaximized() then win?.unmaximize() else win?.maximize()
 ipc.on 'closeWin',       -> win?.close()
+ipc.on 'setScheme', (event, arg) -> scheme = arg
     
 #000   000  000  000   000  0000000     0000000   000   000
 #000 0 000  000  0000  000  000   000  000   000  000 0 000
@@ -92,7 +94,10 @@ saveBounds = ->
     if win?
         prefs.set 'bounds', win.getBounds()
 
-showAbout = -> about img: "#{__dirname}/../img/about.png"
+showAbout = -> 
+    about 
+        img: "#{__dirname}/../img/about.png"
+        background: scheme == 'bright' and '#fff' or "#222"
             
 app.on 'window-all-closed', (event) -> event.preventDefault()
 
@@ -163,16 +168,6 @@ app.on 'ready', ->
             click:       -> win?.close()
         ,
             type: 'separator'
-        ,                            
-            label:       'Bring All to Front'
-            accelerator: 'Alt+Cmd+`'
-            click:       -> win?.show()
-        ,
-            type: 'separator'
-        ,   
-            label:       'Reload Window'
-            accelerator: 'Ctrl+Alt+Cmd+L'
-            click:       -> win?.webContents.reloadIgnoringCache()
         ,                
             label:       'Toggle DevTools'
             accelerator: 'Cmd+Alt+I'
