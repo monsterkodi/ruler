@@ -75,8 +75,8 @@ class Loupe
         x = clamp -@cursorPos.x, (b.width  - @size) - @cursorPos.x, -@size/2
         y = clamp -@cursorPos.y, (b.height - @size) - @cursorPos.y, -@size/2
 
-        ox = @offset.x*2
-        oy = @offset.y*2
+        ox = @offset.x*@zoom
+        oy = @offset.y*@zoom
         
         @div.style.display = 'inherit'
         @div.style.left    = "#{x}px"
@@ -84,15 +84,15 @@ class Loupe
         @div.style.width   = "#{@size}px"
         @div.style.height  = "#{@size}px"
             
-        setStyle '.loupe.cursor.line.horizontal', 'height', "#{@zoom*16}px"
-        setStyle '.loupe.cursor.line.horizontal', 'top',    "#{@size/2-@zoom*8-oy}px"
-        setStyle '.loupe.cursor.line.horizontal', 'left',   "#{@size/2-@zoom-ox}px"
-        setStyle '.loupe.cursor.line.horizontal', 'width',  "#{@zoom*2}px"
+        setStyle '.loupe.line.horizontal', 'height', "#{@zoom*16}px"
+        setStyle '.loupe.line.horizontal', 'top',    "#{@size/2-@zoom*8-oy}px"
+        setStyle '.loupe.line.horizontal', 'left',   "#{@size/2-@zoom-ox}px"
+        setStyle '.loupe.line.horizontal', 'width',  "#{@zoom*2}px"
         
-        setStyle '.loupe.cursor.line.vertical',   'width',  "#{@zoom*16}px"
-        setStyle '.loupe.cursor.line.vertical',   'left',   "#{@size/2-@zoom*8-ox}px"
-        setStyle '.loupe.cursor.line.vertical',   'top',    "#{@size/2-@zoom-oy}px"
-        setStyle '.loupe.cursor.line.vertical',   'height', "#{@zoom*2}px"       
+        setStyle '.loupe.line.vertical',   'width',  "#{@zoom*16}px"
+        setStyle '.loupe.line.vertical',   'left',   "#{@size/2-@zoom*8-ox}px"
+        setStyle '.loupe.line.vertical',   'top',    "#{@size/2-@zoom-oy}px"
+        setStyle '.loupe.line.vertical',   'height', "#{@zoom*2}px"       
         
     updateImage: ->
         return if not @desktop?

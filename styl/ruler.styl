@@ -81,11 +81,11 @@ body
 #cursor
     position            absolute
 
+#loupe .line
 #cursor .line
     background          rgba(128,128,128,0.5)
 
 #loupe    
-    // opacity             0.85
     overflow            hidden
     position            relative
     background-size     100% 100%
@@ -133,8 +133,13 @@ body
     position            absolute
     overflow            visible
 
-.line.horizontal
+.ruler .line.horizontal
     bottom              0
+
+.ruler .line.vertical
+    right               0
+
+.line.horizontal
     width               1px
     height              (rulerSize / 5)
     &._10
@@ -145,12 +150,11 @@ body
     &._100
         height          (rulerSize / 3)    
     &.cursor
-        height          21px
-        top             -10px
-        width           1px
+        left            0
+        height          17px
+        top             -8px
 
 .line.vertical
-    right 0
     height              1px
     width               (rulerSize / 5)
     &._10
@@ -161,9 +165,9 @@ body
     &._100
         width           (rulerSize / 3)
     &.cursor
-        width           21px
-        left            -10px 
-        height          1px
+        top             0
+        width           17px
+        left            -8px 
 
 // 000   000  000   000  00     00  
 // 0000  000  000   000  000   000  
