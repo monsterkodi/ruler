@@ -71,12 +71,24 @@ body
     pointer-events      all
     width               rulerSize
     height              rulerSize
-    
-#loupe    
+
+// 000       0000000   000   000  00000000   00000000  
+// 000      000   000  000   000  000   000  000       
+// 000      000   000  000   000  00000000   0000000   
+// 000      000   000  000   000  000        000       
+// 0000000   0000000    0000000   000        00000000  
+
+#cursor
     position            absolute
+
+#cursor .line
+    background          rgba(128,128,128,0.5)
+
+#loupe    
+    // opacity             0.85
+    overflow            hidden
+    position            relative
     background-size     100% 100%
-    width               201px
-    height              201px
     box-sizing          border-box
     border              1px solid rgba(128,128,128,0.5)
     
@@ -133,9 +145,9 @@ body
     &._100
         height          (rulerSize / 3)    
     &.cursor
-        height          40px
-        top             -18px
-        width              4px
+        height          21px
+        top             -10px
+        width           1px
 
 .line.vertical
     right 0
@@ -149,9 +161,9 @@ body
     &._100
         width           (rulerSize / 3)
     &.cursor
-        width           40px
-        left            -18px 
-        height              4px
+        width           21px
+        left            -10px 
+        height          1px
 
 // 000   000  000   000  00     00  
 // 0000  000  000   000  000   000  
@@ -185,12 +197,7 @@ body
 
 .border
 .handle
-#cursor
     position            absolute
-    position            absolute
-
-#cursor .line
-    background          rgba(128,128,128,0.5)
     
 .right
     right               0
@@ -233,9 +240,10 @@ body
 // 000   000  00000000   0000000     000     
 
 #rect
+#louperect
     position            absolute
     background          rgba(128,128,128,0.4)
-    
+
 //    0000000  000  0000000  00000000  
 //   000       000     000   000       
 //   0000000   000    000    0000000   

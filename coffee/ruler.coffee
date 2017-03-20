@@ -46,10 +46,8 @@ ipc.on 'setActive', (event, active) -> setActive active
 # 00     00  000  000   000  000   000  000   000  000  000   000  
 
 winMain = (id) ->
-    win = browser.fromId id 
+    window.win = win = browser.fromId id 
     win.on 'move', -> doSkipMouse()
-    
-    # win?.webContents.openDevTools() 
     
     horz =$ 'horz' 
     vert =$ 'vert'
@@ -168,11 +166,13 @@ initDrag = ->
             document.body.appendChild info
             
             rect =$ 'rect'
-            rect.style.display = 'unset'
+            rect.style.display = 'initial'
             rect.style.left    = "#{absPos.x-1}px"
             rect.style.top     = "#{absPos.y-1}px"
             rect.style.width   = "1px"
             rect.style.height  = "1px"
+            
+            loupe.setRect w:1, h:1
             
         onMove: (drag, event) => 
 
@@ -202,11 +202,14 @@ initDrag = ->
             posy.textContent = "y #{absPos.y}"
             rctw.textContent = "w #{w+(w < 0 and -1 or 1)}"
             rcth.textContent = "h #{h+(h < 0 and -1 or 1)}"
+
+            loupe.setRect w:w, h:h            
             
         onStop: =>
             rect =$ 'rect'
             rect.style.display = 'none'
             $('info')?.remove()
+            loupe.setRect w:0, h:0
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
@@ -326,7 +329,7 @@ onMousePos = (p) ->
     x = p.x - b.x 
     y = p.y - b.y 
     
-    loupe?.moveTo p, x, y
+    loupe?.moveTo p, pos x, y
         
     h =$ '.needle.line.horizontal' 
     v =$ '.needle.line.vertical' 
@@ -355,6 +358,9 @@ document.onkeydown = (event) ->
 
     switch key
         when 'left', 'right', 'up', 'down' then moveWin key, mod
+        when '-'                then loupe.decreaseZoom()
+        when '='                then loupe.increaseZoom()
+        when '0', 'l'           then loupe.toggle()
     
     switch combo
         when 'command+c', 'c'   then return copyImage()
