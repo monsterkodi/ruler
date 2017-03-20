@@ -15,6 +15,7 @@ keyinfo   = require './tools/keyinfo'
 drag      = require './tools/drag'
 elem      = require './tools/elem'
 str       = require './tools/str'
+Loupe     = require './loupe'
 _         = require 'lodash'
 electron  = require 'electron'
 path      = require 'path'
@@ -28,6 +29,7 @@ horz      = null
 vert      = null
 horzLines = null
 vertLines = null
+loupe     = null
 mousePos  = pos 0, 0
 skipMouse = false
 skipTimer = null
@@ -69,12 +71,13 @@ winMain = (id) ->
     ctrl.addEventListener 'mouseup', -> doSkipMouse 10
         
     window.requestAnimationFrame animationFrame
-    
+        
     setOrigin 'outside'
     initRulers()
     initDrag()
     resize()
- 
+    loupe = new Loupe
+     
 animationFrame = ->
     screenPos = pos screen.getCursorScreenPoint()
     if not skipMouse and not mousePos.equals screenPos
@@ -96,9 +99,14 @@ setActive = (active) ->
     if active
         setStyle "#ctrl", "background-blend-mode", "normal"
         setStyle "#body", "opacity", 1
+        showCursor = ->
+            loupe.refreshDesktop()
+            $('cursor').style.display = 'unset'
+        setTimeout showCursor, 300
     else
         setStyle "#ctrl", "background-blend-mode", "soft-light"
         setStyle "#body", "opacity", 0.65
+        $('cursor').style.display = 'none'
     
 # 00000000   000   000  000      00000000  00000000    0000000  
 # 000   000  000   000  000      000       000   000  000       
@@ -159,12 +167,12 @@ initDrag = ->
             info.style.top  = "#{absPos.y}px"
             document.body.appendChild info
             
-            rect = elem id: 'rect'
-            rect.style.left = "#{absPos.x-1}px"
-            rect.style.top  = "#{absPos.y-1}px"
-            rect.style.width = "1px"
+            rect =$ 'rect'
+            rect.style.display = 'unset'
+            rect.style.left    = "#{absPos.x-1}px"
+            rect.style.top     = "#{absPos.y-1}px"
+            rect.style.width   = "1px"
             rect.style.height  = "1px"
-            document.body.appendChild rect
             
         onMove: (drag, event) => 
 
@@ -196,7 +204,8 @@ initDrag = ->
             rcth.textContent = "h #{h+(h < 0 and -1 or 1)}"
             
         onStop: =>
-            $('rect')?.remove()
+            rect =$ 'rect'
+            rect.style.display = 'none'
             $('info')?.remove()
 
 # 00000000   00000000   0000000  000  0000000  00000000
@@ -268,13 +277,13 @@ toggleStyle = ->
 
     link.parentNode.replaceChild newlink, link
 
-# 00     00   0000000   000   000  00000000  
-# 000   000  000   000  000   000  000       
-# 000000000  000   000   000 000   0000000   
-# 000 0 000  000   000     000     000       
-# 000   000   0000000       0      00000000  
+# 00     00   0000000   000   000  00000000  000   000  000  000   000  
+# 000   000  000   000  000   000  000       000 0 000  000  0000  000  
+# 000000000  000   000   000 000   0000000   000000000  000  000 0 000  
+# 000 0 000  000   000     000     000       000   000  000  000  0000  
+# 000   000   0000000       0      00000000  00     00  000  000   000  
 
-move = (key, mod) ->
+moveWin = (key, mod) ->
     
     x = switch key
         when 'left'  then -1
@@ -316,6 +325,8 @@ onMousePos = (p) ->
 
     x = p.x - b.x 
     y = p.y - b.y 
+    
+    loupe?.moveTo p, x, y
         
     h =$ '.needle.line.horizontal' 
     v =$ '.needle.line.vertical' 
@@ -343,13 +354,10 @@ document.onkeydown = (event) ->
     return if not combo
 
     switch key
-        when 'left', 'right', 'up', 'down' then move key, mod
+        when 'left', 'right', 'up', 'down' then moveWin key, mod
     
     switch combo
         when 'command+c', 'c'   then return copyImage()
-        when 'right'            then return move  1,  0
-        when 'up'               then return move  0, -1
-        when 'down'             then return move  0,  1
         when 'esc'              then return win?.close()
         when 'i'                then toggleStyle()
         when 'o'                then toggleOrigin()

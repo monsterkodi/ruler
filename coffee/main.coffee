@@ -82,6 +82,8 @@ createWindow = ->
         
     win.on 'closed', -> win = null
     win.on 'close',  -> app.dock.hide()
+    win.on 'move',   saveBounds
+    win.on 'resize', saveBounds
     win.on 'blur',   onBlur
     win.on 'focus',  onFocus
     app.dock.show()
@@ -94,9 +96,7 @@ onFocus = ->
     win?.setIgnoreMouseEvents false
     win?.webContents.send 'setActive', true
 
-saveBounds = ->
-    if win?
-        prefs.set 'bounds', win.getBounds()
+saveBounds = -> if win? then prefs.set 'bounds', win.getBounds()
 
 showAbout = -> 
     about 
@@ -110,7 +110,7 @@ showAbout = ->
 #  0000000   0000000   000           000     000  000   000  000   000   0000000   00000000  
 
 copyImage = (rect) ->
-    tmpFile = resolve '$TMPDIR/clippo.png'
+    tmpFile = resolve '$TMPDIR/ruler.png'
     rect.x += win.getBounds().x
     rect.y += win.getBounds().y
     win.hide()
