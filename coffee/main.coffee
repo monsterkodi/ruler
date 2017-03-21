@@ -156,7 +156,7 @@ app.on 'ready', ->
         ,
             label:       "Hide #{pkg.productName}"
             accelerator: 'Cmd+H'
-            role:        'hide'
+            click:        -> win?.close()
         ,
             label:       'Hide Others'
             accelerator: 'Cmd+Alt+H'
@@ -201,8 +201,7 @@ app.on 'ready', ->
         ]
     ]
         
-    prefs.init "#{app.getPath('userData')}/#{pkg.productName}.noon",
-        shortcut: 'F6'
+    prefs.init "#{app.getPath('userData')}/#{pkg.productName}.noon", shortcut: 'F6'
 
     electron.globalShortcut.register prefs.get('shortcut'), showWindow
     

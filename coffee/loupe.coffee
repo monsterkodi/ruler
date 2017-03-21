@@ -20,7 +20,7 @@ class Loupe
     constructor: () ->
         @desktop = null
         @refreshDesktop()
-        @zoom = 2
+        @zoom = 0
         @size = 200
         @rect = w:0, h:0
         @offset = x:0, y:0

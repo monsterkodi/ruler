@@ -8,14 +8,15 @@ sw,sh,
 setStyle,
 last,
 $}        = require './tools/tools'
-prefs     = require './tools/prefs'
-pos       = require './tools/pos'
-log       = require './tools/log'
 keyinfo   = require './tools/keyinfo'
+prefs     = require './tools/prefs'
 drag      = require './tools/drag'
 elem      = require './tools/elem'
+pos       = require './tools/pos'
+log       = require './tools/log'
 str       = require './tools/str'
 Loupe     = require './loupe'
+pkg       = require '../package'
 _         = require 'lodash'
 electron  = require 'electron'
 path      = require 'path'
@@ -47,6 +48,9 @@ ipc.on 'setActive', (event, active) -> setActive active
 
 winMain = (id) ->
     window.win = win = browser.fromId id 
+    
+    prefs.init "#{electron.remote.app.getPath('userData')}/#{pkg.productName}.noon"
+    
     win.on 'move', -> doSkipMouse()
     
     horz =$ 'horz' 
@@ -69,12 +73,15 @@ winMain = (id) ->
     ctrl.addEventListener 'mouseup', -> doSkipMouse 10
         
     window.requestAnimationFrame animationFrame
-        
-    setOrigin 'outside'
+            
     initRulers()
     initDrag()
     resize()
     loupe = new Loupe
+    
+    setOrigin prefs.get 'origin', 'outside'
+    s = prefs.get 'scheme', 'dark.css'
+    setScheme s
      
 animationFrame = ->
     screenPos = pos screen.getCursorScreenPoint()
@@ -265,17 +272,23 @@ setOrigin = (o) ->
 #      000     000        000     000      000       
 # 0000000      000        000     0000000  00000000  
 
-toggleStyle = ->
-    link = $('style-link')
+toggleScheme = ->
+    link =$ 'style-link' 
     currentScheme = last link.href.split('/')
     schemes = ['dark.css', 'bright.css']
     nextSchemeIndex = ( schemes.indexOf(currentScheme) + 1) % schemes.length
     nextScheme = schemes[nextSchemeIndex]
     ipc.send 'setScheme', path.basename nextScheme, '.css'
+    prefs.set 'scheme', nextScheme
+    setScheme nextScheme
+    
+setScheme = (style) ->
+    log 'setStyle!', style
+    link =$ 'style-link' 
     newlink = elem 'link', 
         rel:  'stylesheet'
         type: 'text/css'
-        href: 'css/'+nextScheme
+        href: "css/#{style}"
         id:   'style-link'
 
     link.parentNode.replaceChild newlink, link
@@ -365,7 +378,7 @@ document.onkeydown = (event) ->
     switch combo
         when 'command+c', 'c'   then return copyImage()
         when 'esc'              then return win?.close()
-        when 'i'                then toggleStyle()
+        when 'i'                then toggleScheme()
         when 'o'                then toggleOrigin()
         when 'command+alt+i'    then return win?.webContents.openDevTools()
         
