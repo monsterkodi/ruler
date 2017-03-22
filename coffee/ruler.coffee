@@ -24,7 +24,7 @@ screen    = electron.screen
 ipc       = electron.ipcRenderer
 remote    = electron.remote
 browser   = remote.BrowserWindow
-win       = null
+win       = remote.getCurrentWindow()
 ctrl      = null
 horz      = null
 vert      = null
@@ -37,8 +37,8 @@ skipTimer = null
 origin    = 'outside'
 offset    = 0
 
-ipc.on 'setWinID', (event, id) -> winMain id
 ipc.on 'setActive', (event, active) -> setActive active
+ipc.on 'capture', -> copyImage()
    
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -46,10 +46,10 @@ ipc.on 'setActive', (event, active) -> setActive active
 # 000   000  000  000  0000  000 0 000  000   000  000  000  0000  
 # 00     00  000  000   000  000   000  000   000  000  000   000  
 
-winMain = (id) ->
-    window.win = win = browser.fromId id 
+winMain = () ->
+    window.win = win
     
-    prefs.init "#{electron.remote.app.getPath('userData')}/#{pkg.productName}.noon"
+    prefs.init()
     
     win.on 'move', -> doSkipMouse()
     
@@ -227,12 +227,13 @@ initDrag = ->
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
 window.onresize = -> resize()
 resize = ->
-    $('width').textContent  = win?.getBounds().width  - offset
-    $('height').textContent = win?.getBounds().height - offset
+    $('width').textContent  = win.getBounds().width  - offset
+    $('height').textContent = win.getBounds().height - offset
 
 copyImage = -> 
-    if $('rect')?
-        br = $('rect').getBoundingClientRect()
+    rect =$ 'rect'
+    br = rect.getBoundingClientRect()
+    if br.width and br.height
         ipc.send 'copyImage', x:br.left, y:br.top, width:br.width, height:br.height
     else
         br = win.getBounds()
@@ -250,6 +251,7 @@ toggleOrigin = ->
 setOrigin = (o) ->
     origin = o
     offset = origin == 'inside' and 22 or 0
+    prefs.set 'origin', origin
     h =$ '.origin.line.horizontal'
     v =$ '.origin.line.vertical'
     horz.style.marginLeft = "#{offset}px"
@@ -283,7 +285,6 @@ toggleScheme = ->
     setScheme nextScheme
     
 setScheme = (style) ->
-    log 'setStyle!', style
     link =$ 'style-link' 
     newlink = elem 'link', 
         rel:  'stylesheet'
@@ -319,7 +320,7 @@ moveWin = (key, mod) ->
     switch mod
         when 'shift', 'ctrl+shift', 'alt+shift', 'command+shift' then size = true
         
-    b = win?.getBounds()
+    b = win.getBounds()
     if size
         b.width  += x
         b.height += y
@@ -327,7 +328,7 @@ moveWin = (key, mod) ->
         b.x += x
         b.y += y
         
-    win?.setBounds b
+    win.setBounds b
 
 # 00     00   0000000   000   000   0000000  00000000  
 # 000   000  000   000  000   000  000       000       
@@ -337,7 +338,7 @@ moveWin = (key, mod) ->
 
 onMousePos = (p) ->
     return if skipMouse
-    b = win?.getBounds()
+    b = win.getBounds()
 
     x = p.x - b.x 
     y = p.y - b.y 
@@ -376,10 +377,10 @@ document.onkeydown = (event) ->
         when '0', 'l'           then loupe.toggle()
     
     switch combo
-        when 'command+c', 'c'   then return copyImage()
-        when 'esc'              then return win?.close()
+        when 'command+c', 'c'   then copyImage()
+        when 'esc'              then win.close()
         when 'i'                then toggleScheme()
         when 'o'                then toggleOrigin()
-        when 'command+alt+i'    then return win?.webContents.openDevTools()
+        when 'command+alt+i'    then win.webContents.openDevTools()
         
-
+winMain()

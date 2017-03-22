@@ -19,8 +19,8 @@ Tray          = electron.Tray
 Menu          = electron.Menu
 clipboard     = electron.clipboard
 ipc           = electron.ipcMain
-win           = undefined
-tray          = undefined
+win           = null
+tray          = null
 scheme        = 'dark'
 
 # 000  00000000    0000000
@@ -62,7 +62,7 @@ createWindow = ->
         resizable:       true
         center:          true
         transparent:     true
-        alwaysOnTop:     true #!!!
+        alwaysOnTop:     true
         frame:           false
         show:            false
         fullscreenable:  false
@@ -75,7 +75,7 @@ createWindow = ->
         minHeight:       22
         
     win.loadURL "file://#{cwd}/ruler.html"
-    win.on 'ready-to-show', -> win.show(); win.webContents.send 'setWinID', win.id
+    win.on 'ready-to-show', -> win.show()
     
     bounds = prefs.get 'bounds'
     win.setBounds bounds if bounds?
@@ -114,7 +114,8 @@ copyImage = (rect) ->
     rect.x += win.getBounds().x
     rect.y += win.getBounds().y
     win.hide()
-    childp.exec "screencapture -T 0 #{tmpFile}", (err) -> 
+    log "copyImage", rect
+    childp.exec "screencapture -T 0 \"#{tmpFile}\"", (err) -> 
         win.show()
         if err? then log "[ERROR] screencapture: #{err}"
         img = nativeImage.createFromPath tmpFile
@@ -201,9 +202,10 @@ app.on 'ready', ->
         ]
     ]
         
-    prefs.init "#{app.getPath('userData')}/#{pkg.productName}.noon", shortcut: 'F6'
+    prefs.init shortcut: 'F3', capture: 'command+F3'
 
-    electron.globalShortcut.register prefs.get('shortcut'), showWindow
+    electron.globalShortcut.register prefs.get('shortcut'), toggleWindow
+    electron.globalShortcut.register prefs.get('capture'),  -> win?.webContents.send 'capture'
     
     createWindow()
 
