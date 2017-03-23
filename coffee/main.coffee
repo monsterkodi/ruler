@@ -3,11 +3,12 @@
 # 000000000  000000000  000  000 0 000
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
-
-{resolve}     = require './tools/tools'
-prefs         = require './tools/prefs'
-about         = require './tools/about'
-log           = require './tools/log'
+{
+resolve,
+prefs,
+about,
+log
+}             = require 'kxk'
 pkg           = require '../package.json'
 childp        = require 'child_process'
 electron      = require 'electron'
@@ -102,6 +103,7 @@ showAbout = ->
     about 
         img: "#{__dirname}/../img/about.png"
         background: scheme == 'bright' and '#fff' or "#222"
+        size: 300
 
 #  0000000   0000000   00000000   000   000  000  00     00   0000000    0000000   00000000  
 # 000       000   000  000   000   000 000   000  000   000  000   000  000        000       

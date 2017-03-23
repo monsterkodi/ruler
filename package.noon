@@ -1,6 +1,6 @@
 name            ruler
 productName     ruler
-version         0.2.0
+version         0.3.0
 description     measurement tool
 main            js/main.js
 repository
@@ -24,6 +24,7 @@ devDependencies
 dependencies
                 fs-extra        ^2.1.2
                 keycode         ^2.1.8
+                kxk             ^0.2.1
                 lodash          ^4.17.4
                 noon            ^1.0.14
                 opener          ^1.4.3

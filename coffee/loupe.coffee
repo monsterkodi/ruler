@@ -8,9 +8,7 @@ sh,sw,
 clamp,
 resolve,
 setStyle,
-$}          = require './tools/tools'
-log         = require './tools/log'
-elem        = require './tools/elem'
+$}          = require 'kxk'
 childp      = require 'child_process'
 electron    = require 'electron'
 nativeImage = electron.nativeImage

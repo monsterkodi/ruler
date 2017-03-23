@@ -6,15 +6,15 @@
 {
 sw,sh,
 setStyle,
+keyinfo,
+prefs,
+drag,
+elem,
 last,
-$}        = require './tools/tools'
-keyinfo   = require './tools/keyinfo'
-prefs     = require './tools/prefs'
-drag      = require './tools/drag'
-elem      = require './tools/elem'
-pos       = require './tools/pos'
-log       = require './tools/log'
-str       = require './tools/str'
+pos,
+log,
+str,
+$}        = require 'kxk'
 Loupe     = require './loupe'
 pkg       = require '../package'
 _         = require 'lodash'
