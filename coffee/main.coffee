@@ -104,6 +104,7 @@ showAbout = ->
         img: "#{__dirname}/../img/about.png"
         background: scheme == 'bright' and '#fff' or "#222"
         size: 300
+        pkg: pkg
 
 #  0000000   0000000   00000000   000   000  000  00     00   0000000    0000000   00000000  
 # 000       000   000  000   000   000 000   000  000   000  000   000  000        000       
@@ -116,7 +117,6 @@ copyImage = (rect) ->
     rect.x += win.getBounds().x
     rect.y += win.getBounds().y
     win.hide()
-    log "copyImage", rect
     childp.exec "screencapture -T 0 \"#{tmpFile}\"", (err) -> 
         win.show()
         if err? then log "[ERROR] screencapture: #{err}"
