@@ -76,7 +76,7 @@ createWindow = ->
         minHeight:       22
         
     win.loadURL "file://#{cwd}/ruler.html"
-    # win.on 'ready-to-show', -> win.show()
+    win.on 'ready-to-show', -> win.show()
     
     bounds = prefs.get 'bounds'
     win.setBounds bounds if bounds?
@@ -209,6 +209,6 @@ app.on 'ready', ->
     electron.globalShortcut.register prefs.get('shortcut'), toggleWindow
     electron.globalShortcut.register prefs.get('capture'),  -> win?.webContents.send 'capture'
     
-    createWindow()
+    # createWindow()
 
     
