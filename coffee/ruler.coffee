@@ -7,6 +7,7 @@
 sw,sh,
 setStyle,
 keyinfo,
+scheme,
 prefs,
 drag,
 elem,
@@ -80,8 +81,7 @@ winMain = () ->
     loupe = new Loupe
     
     setOrigin prefs.get 'origin', 'outside'
-    s = prefs.get 'scheme', 'dark.css'
-    setScheme s
+    scheme.set prefs.get 'scheme', 'dark'
      
 animationFrame = ->
     screenPos = pos screen.getCursorScreenPoint()
@@ -268,32 +268,6 @@ setOrigin = (o) ->
         v.style.bottom = 'unset'
     resize()
 
-#  0000000  000000000  000   000  000      00000000  
-# 000          000      000 000   000      000       
-# 0000000      000       00000    000      0000000   
-#      000     000        000     000      000       
-# 0000000      000        000     0000000  00000000  
-
-toggleScheme = ->
-    link =$ 'style-link' 
-    currentScheme = last link.href.split('/')
-    schemes = ['dark.css', 'bright.css']
-    nextSchemeIndex = ( schemes.indexOf(currentScheme) + 1) % schemes.length
-    nextScheme = schemes[nextSchemeIndex]
-    ipc.send 'setScheme', path.basename nextScheme, '.css'
-    prefs.set 'scheme', nextScheme
-    setScheme nextScheme
-    
-setScheme = (style) ->
-    link =$ 'style-link' 
-    newlink = elem 'link', 
-        rel:  'stylesheet'
-        type: 'text/css'
-        href: "css/#{style}"
-        id:   'style-link'
-
-    link.parentNode.replaceChild newlink, link
-
 # 00     00   0000000   000   000  00000000  000   000  000  000   000  
 # 000   000  000   000  000   000  000       000 0 000  000  0000  000  
 # 000000000  000   000   000 000   0000000   000000000  000  000 0 000  
@@ -379,7 +353,7 @@ document.onkeydown = (event) ->
     switch combo
         when 'command+c', 'c'   then copyImage()
         when 'esc'              then win.close()
-        when 'i'                then toggleScheme()
+        when 'command+i', 'i'   then scheme.toggle()
         when 'o'                then toggleOrigin()
         when 'command+alt+i'    then win.webContents.openDevTools()
         

@@ -22,7 +22,6 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 win           = null
 tray          = null
-scheme        = 'dark'
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -30,9 +29,6 @@ scheme        = 'dark'
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'toggleMaximize', -> if win?.isMaximized() then win?.unmaximize() else win?.maximize()
-ipc.on 'closeWin',       -> win?.close()
-ipc.on 'setScheme', (event, arg) -> scheme = arg
 ipc.on 'copyImage', (event, arg) -> copyImage arg
     
 #000   000  000  000   000  0000000     0000000   000   000
@@ -100,6 +96,7 @@ onFocus = ->
 saveBounds = -> if win? then prefs.set 'bounds', win.getBounds()
 
 showAbout = -> 
+    scheme = prefs.get 'scheme', 'dark'
     about 
         img: "#{__dirname}/../img/about.png"
         background: scheme == 'bright' and '#fff' or "#222"
