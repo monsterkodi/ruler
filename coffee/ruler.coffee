@@ -1,25 +1,16 @@
-# 00000000   000   000  000      00000000  00000000   
-# 000   000  000   000  000      000       000   000  
-# 0000000    000   000  000      0000000   0000000    
-# 000   000  000   000  000      000       000   000  
-# 000   000   0000000   0000000  00000000  000   000  
-{
-sw,sh,
-setStyle,
-keyinfo,
-scheme,
-prefs,
-drag,
-elem,
-pos,
-log,
-str,
-$}        = require 'kxk'
+###
+00000000   000   000  000      00000000  00000000   
+000   000  000   000  000      000       000   000  
+0000000    000   000  000      0000000   0000000    
+000   000  000   000  000      000       000   000  
+000   000   0000000   0000000  00000000  000   000  
+###
+{ sw, sh, setStyle, keyinfo, scheme, prefs, drag, elem, pos, log, str, $, _ } = require 'kxk'
+
 Loupe     = require './loupe'
 pkg       = require '../package'
-_         = require 'lodash'
 electron  = require 'electron'
-path      = require 'path'
+
 screen    = electron.screen
 ipc       = electron.ipcRenderer
 remote    = electron.remote

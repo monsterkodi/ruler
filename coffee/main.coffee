@@ -1,18 +1,16 @@
-# 00     00   0000000   000  000   000
-# 000   000  000   000  000  0000  000
-# 000000000  000000000  000  000 0 000
-# 000 0 000  000   000  000  000  0000
-# 000   000  000   000  000  000   000
-{
-resolve,
-prefs,
-about,
-log
-}             = require 'kxk'
+###
+00     00   0000000   000  000   000
+000   000  000   000  000  0000  000
+000000000  000000000  000  000 0 000
+000 0 000  000   000  000  000  0000
+000   000  000   000  000  000   000
+###
+
+{ resolve, childp, prefs, about, noon, log } = require 'kxk'
+
 pkg           = require '../package.json'
-childp        = require 'child_process'
 electron      = require 'electron'
-noon          = require 'noon'
+
 app           = electron.app
 BrowserWindow = electron.BrowserWindow
 nativeImage   = electron.nativeImage
@@ -40,7 +38,7 @@ ipc.on 'copyImage', (event, arg) -> copyImage arg
 toggleWindow = ->
     if win?.isVisible()
         win.hide()    
-        app.dock.hide()
+        app.dock?.hide()
     else
         showWindow()
 
@@ -49,7 +47,7 @@ showWindow = ->
         win.show()
     else
         createWindow()
-    app.dock.show()
+    app.dock?.show()
     
 createWindow = ->
     cwd = __dirname
@@ -78,12 +76,12 @@ createWindow = ->
     win.setBounds bounds if bounds?
         
     win.on 'closed', -> win = null
-    win.on 'close',  -> app.dock.hide()
+    win.on 'close',  -> app.dock?.hide()
     win.on 'move',   saveBounds
     win.on 'resize', saveBounds
     win.on 'blur',   onBlur
     win.on 'focus',  onFocus
-    app.dock.show()
+    app.dock?.show()
     win
 
 onBlur = -> 
@@ -96,6 +94,7 @@ onFocus = ->
 saveBounds = -> if win? then prefs.set 'bounds', win.getBounds()
 
 showAbout = -> 
+    
     scheme = prefs.get 'scheme', 'dark'
     about 
         img: "#{__dirname}/../img/about.png"
@@ -110,6 +109,7 @@ showAbout = ->
 #  0000000   0000000   000           000     000  000   000  000   000   0000000   00000000  
 
 copyImage = (rect) ->
+    
     tmpFile = resolve '$TMPDIR/ruler.png'
     rect.x += win.getBounds().x
     rect.y += win.getBounds().y
@@ -137,7 +137,7 @@ app.on 'ready', ->
     
     tray = new Tray "#{__dirname}/../img/menu.png"
     tray.on 'click', toggleWindow
-    app.dock.hide() if app.dock
+    app.dock?.hide()
             
     # 00     00  00000000  000   000  000   000
     # 000   000  000       0000  000  000   000
