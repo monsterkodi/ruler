@@ -5,15 +5,15 @@
 000   000  000   000  000      000       000   000  
 000   000   0000000   0000000  00000000  000   000  
 ###
-{ sw, sh, setStyle, keyinfo, scheme, prefs, drag, elem, pos, log, str, $, _ } = require 'kxk'
+{ sw, sh, setStyle, keyinfo, scheme, prefs, drag, elem, kpos, $, _ } = require 'kxk'
 
 Loupe     = require './loupe'
 pkg       = require '../package'
 electron  = require 'electron'
 
-screen    = electron.screen
 ipc       = electron.ipcRenderer
 remote    = electron.remote
+screen    = remote.screen
 browser   = remote.BrowserWindow
 win       = remote.getCurrentWindow()
 ctrl      = null
@@ -22,7 +22,7 @@ vert      = null
 horzLines = null
 vertLines = null
 loupe     = null
-mousePos  = pos 0, 0
+mousePos  = kpos 0, 0
 skipMouse = false
 skipTimer = null
 origin    = 'outside'
@@ -74,7 +74,7 @@ winMain = () ->
     scheme.set prefs.get 'scheme', 'dark'
      
 animationFrame = ->
-    screenPos = pos screen.getCursorScreenPoint()
+    screenPos = kpos screen.getCursorScreenPoint()
     if not skipMouse and not mousePos.equals screenPos
         mousePos = screenPos
         onMousePos mousePos
@@ -85,7 +85,7 @@ doSkipMouse = (delay=500) ->
     clearTimeout skipTimer
     updateMouse = ->
         skipMouse = false
-        mousePos = pos screen.getCursorScreenPoint()
+        mousePos = kpos screen.getCursorScreenPoint()
         onMousePos mousePos
     if delay
         skipTimer = setTimeout updateMouse, delay 
@@ -150,7 +150,7 @@ initDrag = ->
         target:  document.body
         onStart: (drag, event) =>
 
-            absPos = pos event
+            absPos = kpos event
             
             info = elem id: 'info', children: [
                 elem id: 'posx', text: "x #{absPos.x - offset}"
@@ -173,7 +173,7 @@ initDrag = ->
             
         onMove: (drag, event) => 
 
-            absPos = pos event
+            absPos = kpos event
             
             info =$ 'info'
             posx =$ 'posx'
@@ -194,7 +194,7 @@ initDrag = ->
             rect.style.width  = "#{Math.abs(w)+1}px"
             rect.style.height = "#{Math.abs(h)+1}px"
             
-            absPos.sub pos offset, offset
+            absPos.sub kpos offset, offset
             posx.textContent = "x #{absPos.x}"
             posy.textContent = "y #{absPos.y}"
             rctw.textContent = "w #{w+(w < 0 and -1 or 1)}"
@@ -301,13 +301,14 @@ moveWin = (key, mod) ->
 # 000   000   0000000    0000000   0000000   00000000  
 
 onMousePos = (p) ->
+    
     return if skipMouse
     b = win.getBounds()
 
     x = p.x - b.x 
     y = p.y - b.y 
     
-    loupe?.moveTo p, pos x, y
+    loupe?.moveTo p, kpos x, y
         
     h =$ '.needle.line.horizontal' 
     v =$ '.needle.line.vertical' 

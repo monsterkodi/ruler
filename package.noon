@@ -1,6 +1,6 @@
 name            ruler
 productName     ruler
-version         0.5.0
+version         0.6.0
 description     measurement tool
 main            js/main.js
 scripts
@@ -20,9 +20,10 @@ license         Unlicense
 bugs
                 url  https://github.com/monsterkodi/ruler/issues
 devDependencies
-                electron        ^1.6.2
-                electron-packager  ^8.5.2
-                electron-rebuild  ^1.5.7
+                electron        ^5.0.6
+                electron-packager  ^14.0.1
+                electron-rebuild  ^1.8.5
+                konrad          ^0.133.0
 dependencies
-                kxk     ^0.8.0
-                opener  ^1.4.3
+                kxk     ^0.325.0
+                opener  ^1.5.1

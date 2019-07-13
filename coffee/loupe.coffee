@@ -5,7 +5,7 @@
 000      000   000  000   000  000        000     
 0000000   0000000    0000000   000        00000000
 ###
-{ sh, sw, childp, clamp, resolve, setStyle, $ } = require 'kxk'
+{ sh, sw, childp, clamp, slash, setStyle, $ } = require 'kxk'
 
 electron    = require 'electron'
 nativeImage = electron.nativeImage
@@ -97,7 +97,7 @@ class Loupe
         @div.style.background = "url(#{img.toDataURL()})"
         
     refreshDesktop: =>
-        tmpFile = resolve '$TMPDIR/ruler_loupe.png'
+        tmpFile = slash.resolve '$TMPDIR/ruler_loupe.png'
         childp.exec "screencapture -T 0 -x #{tmpFile}", (err) => 
             if err? then log "[ERROR] screencapture: #{err}"
             @desktop = nativeImage.createFromPath tmpFile

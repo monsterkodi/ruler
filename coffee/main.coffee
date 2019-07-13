@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ resolve, childp, prefs, about, noon, log } = require 'kxk'
+{ slash, childp, prefs, about, noon } = require 'kxk'
 
 pkg           = require '../package.json'
 electron      = require 'electron'
@@ -68,6 +68,8 @@ createWindow = ->
         height:          1000
         minWidth:        22
         minHeight:       22
+        webPreferences: 
+            nodeIntegration: true
         
     win.loadURL "file://#{cwd}/ruler.html"
     win.on 'ready-to-show', -> win.show()
@@ -110,13 +112,13 @@ showAbout = ->
 
 copyImage = (rect) ->
     
-    tmpFile = resolve '$TMPDIR/ruler.png'
+    tmpFile = slash.resolve '$TMPDIR/ruler.png'
     rect.x += win.getBounds().x
     rect.y += win.getBounds().y
     win.hide()
     childp.exec "screencapture -T 0 \"#{tmpFile}\"", (err) -> 
         win.show()
-        if err? then log "[ERROR] screencapture: #{err}"
+        if err? then error "[ERROR] screencapture: #{err}"
         img = nativeImage.createFromPath tmpFile
         rect.x *= 2
         rect.y *= 2
